@@ -52,9 +52,6 @@ func (l *Lexer) parseUnknown() error {
 		case 'd':
 			literal := token.NewToken(token.DICT_ENTRY, string(c))
 			l.tokens = append(l.tokens, literal)
-		case ':':
-			literal := token.NewToken(token.COLON, string(c))
-			l.tokens = append(l.tokens, literal)
 		case 'e':
 			literal := token.NewToken(token.END, string(c))
 			l.tokens = append(l.tokens, literal)
