@@ -1,98 +1,112 @@
 package lexer
 
 import (
+	"errors"
 	"strconv"
 	"unicode"
 
 	"github.com/chau-t-tran/bengo/token"
 )
 
+const (
+	expectingNothing = 0
+	expectingBytes   = 1
+	expectingInt     = 2
+)
+
 type Lexer struct {
-	curr   int
-	chars  []rune
-	tokens []token.Token
+	index      int
+	state      int
+	byteLength int
+	chars      []rune
 }
 
-func NewLexer() Lexer {
+func NewLexer(input string) Lexer {
 	return Lexer{
-		curr:   0,
-		chars:  []rune{},
-		tokens: []token.Token{},
+		index:      0,
+		state:      0,
+		byteLength: 0,
+		chars:      []rune(input),
 	}
 }
 
-func (l *Lexer) Lex(input string) []token.Token {
-	l.clear()
-	l.chars = []rune(input)
-	l.curr = 0
-	l.parseUnknown()
-	return l.tokens
-}
+func (l *Lexer) NextToken() (t token.Token, err error) {
+	if l.index >= len(l.chars) {
+		err = errors.New("End of input")
+		return
+	}
 
-func (l *Lexer) clear() {
-	l.curr = 0
-	l.chars = []rune{}
-	l.tokens = []token.Token{}
-}
+	c := l.chars[l.index]
+	switch c {
+	case 'i':
+		t = token.NewToken(token.INT_ENTRY, string(c))
+		l.state = expectingInt
+		l.index += 1
+	case 'l':
+		t = token.NewToken(token.LIST_ENTRY, string(c))
+		l.state = expectingNothing
+		l.index += 1
+	case 'd':
+		t = token.NewToken(token.DICT_ENTRY, string(c))
+		l.state = expectingNothing
+		l.index += 1
+	case 'e':
+		t = token.NewToken(token.END, string(c))
+		l.state = expectingNothing
+		l.index += 1
+	case ':':
+		t = token.NewToken(token.COLON, string(c))
+		l.index += 1
+	}
 
-func (l *Lexer) parseUnknown() error {
-	for l.curr < len(l.chars) {
-		c := l.chars[l.curr]
-		switch c {
-		case 'i':
-			entry := token.NewToken(token.INT_ENTRY, string(c))
-			// expect digits
-			l.curr += 1
-			digits := l.parseDigits()
-			value := token.NewToken(token.INT_VALUE, digits)
-			l.tokens = append(l.tokens, entry, value)
-		case 'l':
-			literal := token.NewToken(token.LIST_ENTRY, string(c))
-			l.tokens = append(l.tokens, literal)
-		case 'd':
-			literal := token.NewToken(token.DICT_ENTRY, string(c))
-			l.tokens = append(l.tokens, literal)
-		case 'e':
-			literal := token.NewToken(token.END, string(c))
-			l.tokens = append(l.tokens, literal)
-		default:
-			if unicode.IsDigit(c) {
-				lengthString := l.parseDigits()
-				lengthToken := token.NewToken(token.BYTE_LENGTH, lengthString)
-				length, _ := strconv.Atoi(lengthString)
-				l.curr += 1
+	if t.Literal != "" {
+		return
+	}
 
-				colonToken := token.NewToken(token.COLON, string(l.chars[l.curr]))
-				l.curr += 1
-
-				bytes := l.parseBytes(length)
-				bytesToken := token.NewToken(token.BYTE_CONTENT, bytes)
-				l.tokens = append(l.tokens, lengthToken, colonToken, bytesToken)
-			}
+	switch l.state {
+	case expectingBytes:
+		bytes := l.nextBytes()
+		l.state = expectingNothing
+		t = token.NewToken(token.BYTE_CONTENT, bytes)
+		break
+	case expectingInt:
+		if unicode.IsDigit(c) {
+			digits := l.nextDigits()
+			l.state = expectingNothing
+			t = token.NewToken(token.INT_VALUE, digits)
+		} else {
+			err = errors.New("Expected digit after int")
 		}
-		l.curr += 1
+		break
+	default:
+		if unicode.IsDigit(c) {
+			digits := l.nextDigits()
+			byteLength, _ := strconv.Atoi(digits)
+			l.byteLength = byteLength
+			l.state = expectingBytes
+			t = token.NewToken(token.BYTE_LENGTH, digits)
+		} else {
+			err = errors.New("Unexpected character")
+		}
 	}
-	return nil
+
+	return
 }
 
-func (l *Lexer) parseDigits() string {
+func (l *Lexer) nextDigits() string {
 	digits := []rune{}
-	for unicode.IsDigit(l.chars[l.curr]) {
-		digits = append(digits, l.chars[l.curr])
-		l.curr += 1
+	for unicode.IsDigit(l.chars[l.index]) {
+		digits = append(digits, l.chars[l.index])
+		l.index += 1
 	}
-	// place pointer right behind nex
-	l.curr -= 1
 	return string(digits)
 }
 
-func (l *Lexer) parseBytes(byteLength int) string {
+func (l *Lexer) nextBytes() string {
 	bytes := []rune{}
-	for i := 0; i < byteLength; i++ {
-		bytes = append(bytes, l.chars[l.curr])
-		l.curr += 1
+	for i := 0; i < l.byteLength; i++ {
+		bytes = append(bytes, l.chars[l.index])
+		l.index += 1
 	}
-	// place pointer right behind nex
-	l.curr -= 1
 	return string(bytes)
 }
