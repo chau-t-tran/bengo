@@ -32,8 +32,7 @@ func NewLexer(input string) Lexer {
 
 func (l *Lexer) NextToken() (t token.Token, err error) {
 	if l.index >= len(l.chars) {
-		err = errors.New("End of input")
-		return
+		return t, errors.New("End of input")
 	}
 
 	c := l.chars[l.index]
@@ -41,25 +40,21 @@ func (l *Lexer) NextToken() (t token.Token, err error) {
 	case 'i':
 		t = token.NewToken(token.INT_ENTRY, string(c))
 		l.state = expectingInt
-		l.index += 1
 	case 'l':
 		t = token.NewToken(token.LIST_ENTRY, string(c))
 		l.state = expectingNothing
-		l.index += 1
 	case 'd':
 		t = token.NewToken(token.DICT_ENTRY, string(c))
 		l.state = expectingNothing
-		l.index += 1
 	case 'e':
 		t = token.NewToken(token.END, string(c))
 		l.state = expectingNothing
-		l.index += 1
 	case ':':
 		t = token.NewToken(token.COLON, string(c))
-		l.index += 1
 	}
 
 	if t.Literal != "" {
+		l.index += 1
 		return
 	}
 
@@ -70,26 +65,26 @@ func (l *Lexer) NextToken() (t token.Token, err error) {
 		t = token.NewToken(token.BYTE_CONTENT, bytes)
 		break
 	case expectingInt:
-		if unicode.IsDigit(c) {
-			digits := l.nextDigits()
-			l.state = expectingNothing
-			t = token.NewToken(token.INT_VALUE, digits)
-		} else {
-			err = errors.New("Expected digit after int")
+		if !unicode.IsDigit(c) {
+			return t, errors.New("Expected digit after int")
 		}
+		digits := l.nextDigits()
+		l.state = expectingNothing
+		t = token.NewToken(token.INT_VALUE, digits)
 		break
 	default:
-		if unicode.IsDigit(c) {
-			digits := l.nextDigits()
-			byteLength, _ := strconv.Atoi(digits)
-			l.byteLength = byteLength
-			l.state = expectingBytes
-			t = token.NewToken(token.BYTE_LENGTH, digits)
-		} else {
-			err = errors.New("Unexpected character")
+		if !unicode.IsDigit(c) {
+			return t, errors.New("Expected digit in byte length definition")
 		}
+		digits := l.nextDigits()
+		byteLength, atoiErr := strconv.Atoi(digits)
+		if atoiErr != nil {
+			return t, atoiErr
+		}
+		l.byteLength = byteLength
+		l.state = expectingBytes
+		t = token.NewToken(token.BYTE_LENGTH, digits)
 	}
-
 	return
 }
 
