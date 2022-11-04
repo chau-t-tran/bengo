@@ -32,45 +32,46 @@ func NewLexer(input string) Lexer {
 
 func (l *Lexer) NextToken() (t token.Token, err error) {
 	if l.index >= len(l.chars) {
-		return t, errors.New("End of input")
+		err = errors.New("End of input")
+		return
 	}
+
 	c := l.chars[l.index]
 	switch c {
 	case 'i':
 		t = token.NewToken(token.INT_ENTRY, string(c))
 		l.state = expectingInt
 		l.index += 1
-		return t, err
 	case 'l':
 		t = token.NewToken(token.LIST_ENTRY, string(c))
 		l.state = expectingNothing
 		l.index += 1
-		return t, err
 	case 'd':
 		t = token.NewToken(token.DICT_ENTRY, string(c))
 		l.state = expectingNothing
 		l.index += 1
-		return t, err
 	case 'e':
 		t = token.NewToken(token.END, string(c))
 		l.state = expectingNothing
 		l.index += 1
-		return t, err
 	case ':':
 		t = token.NewToken(token.COLON, string(c))
 		l.index += 1
-		return t, err
+	}
+
+	if t.Literal != "" {
+		return
 	}
 
 	switch l.state {
 	case expectingBytes:
-		bytes := l.parseBytes()
+		bytes := l.nextBytes()
 		l.state = expectingNothing
 		t = token.NewToken(token.BYTE_CONTENT, bytes)
 		break
 	case expectingInt:
 		if unicode.IsDigit(c) {
-			digits := l.parseDigits()
+			digits := l.nextDigits()
 			l.state = expectingNothing
 			t = token.NewToken(token.INT_VALUE, digits)
 		} else {
@@ -79,7 +80,7 @@ func (l *Lexer) NextToken() (t token.Token, err error) {
 		break
 	default:
 		if unicode.IsDigit(c) {
-			digits := l.parseDigits()
+			digits := l.nextDigits()
 			byteLength, _ := strconv.Atoi(digits)
 			l.byteLength = byteLength
 			l.state = expectingBytes
@@ -89,10 +90,10 @@ func (l *Lexer) NextToken() (t token.Token, err error) {
 		}
 	}
 
-	return t, err
+	return
 }
 
-func (l *Lexer) parseDigits() string {
+func (l *Lexer) nextDigits() string {
 	digits := []rune{}
 	for unicode.IsDigit(l.chars[l.index]) {
 		digits = append(digits, l.chars[l.index])
@@ -101,7 +102,7 @@ func (l *Lexer) parseDigits() string {
 	return string(digits)
 }
 
-func (l *Lexer) parseBytes() string {
+func (l *Lexer) nextBytes() string {
 	bytes := []rune{}
 	for i := 0; i < l.byteLength; i++ {
 		bytes = append(bytes, l.chars[l.index])

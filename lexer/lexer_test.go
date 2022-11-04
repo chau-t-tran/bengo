@@ -40,17 +40,17 @@ func (suite *LexerTestSuite) TestConstructor() {
 	assert.Equal(suite.T(), expected.chars, mock.chars)
 }
 
-func (suite *LexerTestSuite) TestParseDigits() {
+func (suite *LexerTestSuite) TestNextDigits() {
 	lexer := NewLexer("1324e")
-	assert.Equal(suite.T(), lexer.parseDigits(), "1324")
+	assert.Equal(suite.T(), lexer.nextDigits(), "1324")
 }
 
-func (suite *LexerTestSuite) TestParseBytes() {
+func (suite *LexerTestSuite) TestNextBytes() {
 	lexer := NewLexer("5:hello")
 	lexer.index = 2
 	lexer.byteLength = 5
 	lexer.state = expectingBytes
-	assert.Equal(suite.T(), lexer.parseBytes(), "hello")
+	assert.Equal(suite.T(), lexer.nextBytes(), "hello")
 }
 
 func (suite *LexerTestSuite) TestByte() {
