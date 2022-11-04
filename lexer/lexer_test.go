@@ -29,8 +29,10 @@ func assertLexerEquals(T *testing.T, expected []token.Token, lexer *Lexer) {
 func (suite *LexerTestSuite) TestConstructor() {
 	mock := NewLexer("i123e")
 	expected := Lexer{
-		curr:  0,
-		chars: []rune("i123e"),
+		index:      0,
+		state:      0,
+		byteLength: 0,
+		chars:      []rune("i123e"),
 	}
 	assert.IsType(suite.T(), expected, mock)
 	assert.Equal(suite.T(), expected.chars, mock.chars)
@@ -43,8 +45,10 @@ func (suite *LexerTestSuite) TestParseDigits() {
 
 func (suite *LexerTestSuite) TestParseBytes() {
 	lexer := NewLexer("5:hello")
-	lexer.curr = 2
-	assert.Equal(suite.T(), lexer.parseBytes(5), "hello")
+	lexer.index = 2
+	lexer.byteLength = 5
+	lexer.state = expectingBytes
+	assert.Equal(suite.T(), lexer.parseBytes(), "hello")
 }
 
 func (suite *LexerTestSuite) TestByte() {
