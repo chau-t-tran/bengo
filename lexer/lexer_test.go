@@ -17,11 +17,13 @@ func assertLexerEquals(T *testing.T, expected []token.Token, lexer *Lexer) {
 		Asserts that the lexer generator produces the correct
 		token output and that it terminates.
 	*/
-	for i, _ := range expected {
+	actual := []token.Token{}
+	for _, _ = range expected {
 		t, err := lexer.NextToken()
+		actual = append(actual, t)
 		assert.NoError(T, err)
-		assert.Equal(T, expected[i], t)
 	}
+	assert.Equal(T, expected, actual)
 	_, err := lexer.NextToken()
 	assert.Error(T, err)
 }
