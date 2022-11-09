@@ -48,20 +48,17 @@ func (suite *ParserTestSuite) TestPeekToken() {
 	expectedColon := token.NewToken(token.COLON, ":")
 	expectedBytes := token.NewToken(token.BYTE_LENGTH, "spam")
 
-	actualLength, err := parser.PeekToken()
-	assert.NoError(suite.T(), err)
+	actualLength := parser.PeekToken()
 	assert.Equal(suite.T(), actualLength, expectedLength)
 	assert.Equal(suite.T(), parser.index, 0)
 	parser.NextToken()
 
-	actualColon, err := parser.PeekToken()
-	assert.NoError(suite.T(), err)
+	actualColon := parser.PeekToken()
 	assert.Equal(suite.T(), actualColon, expectedColon)
 	assert.Equal(suite.T(), parser.index, 1)
 	parser.NextToken()
 
-	actualBytes, err := parser.PeekToken()
-	assert.NoError(suite.T(), err)
+	actualBytes := parser.PeekToken()
 	assert.Equal(suite.T(), actualBytes, expectedBytes)
 	assert.Equal(suite.T(), parser.index, 2)
 }
