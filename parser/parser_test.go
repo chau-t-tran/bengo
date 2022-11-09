@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/chau-t-tran/bengo/ast"
+	"github.com/chau-t-tran/bengo/lexer"
 	"github.com/chau-t-tran/bengo/token"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -14,49 +15,64 @@ type ParserTestSuite struct {
 }
 
 func (suite *ParserTestSuite) TestNextToken() {
-	lexer := NewLexer("4:spam")
-	parser := newParser(lexer)
-
-	expectedLength, err := token.NewToken(token.BYTE_LENGTH, "4")
-	assert.NoError(suite.T(), err)
-	expectedColon, err := token.NewToken(token.COLON, ":")
-	assert.NoError(suite.T(), err)
-	expectedBytes, err := token.NewToken(BYTE_LENGTH, "spam")
+	lexer := lexer.NewLexer("4:spam")
+	parser, err := newParser(lexer)
 	assert.NoError(suite.T(), err)
 
-	assert.Equal(suite.T(), parser.NextToken(), expectedLength)
+	expectedLength := token.NewToken(token.BYTE_LENGTH, "4")
+	expectedColon := token.NewToken(token.COLON, ":")
+	expectedBytes := token.NewToken(token.BYTE_LENGTH, "spam")
+
+	actualLength, err := parser.NextToken()
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), actualLength, expectedLength)
 	assert.Equal(suite.T(), parser.index, 1)
-	assert.Equal(suite.T(), parser.NextToken(), expectedColon)
+
+	actualColon, err := parser.NextToken()
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), actualColon, expectedColon)
 	assert.Equal(suite.T(), parser.index, 2)
-	assert.Equal(suite.T(), parser.NextToken(), expectedBytes)
+
+	actualBytes, err := parser.NextToken()
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), actualBytes, expectedBytes)
 	assert.Equal(suite.T(), parser.index, 6)
 }
 
 func (suite *ParserTestSuite) TestPeekToken() {
-	lexer := NewLexer("4:spam")
-	parser := newParser(lexer)
-
-	expectedLength, err := token.NewToken(token.BYTE_LENGTH, "4")
-	assert.NoError(suite.T(), err)
-	expectedColon, err := token.NewToken(token.COLON, ":")
-	assert.NoError(suite.T(), err)
-	expectedBytes, err := token.NewToken(BYTE_LENGTH, "spam")
+	lexer := lexer.NewLexer("4:spam")
+	parser, err := newParser(lexer)
 	assert.NoError(suite.T(), err)
 
-	assert.Equal(suite.T(), parser.PeekToken(), expectedLength)
+	expectedLength := token.NewToken(token.BYTE_LENGTH, "4")
+	expectedColon := token.NewToken(token.COLON, ":")
+	expectedBytes := token.NewToken(token.BYTE_LENGTH, "spam")
+
+	actualLength, err := parser.PeekToken()
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), actualLength, expectedLength)
 	assert.Equal(suite.T(), parser.index, 0)
 	parser.NextToken()
-	assert.Equal(suite.T(), parser.PeekToken(), expectedColon)
+
+	actualColon, err := parser.PeekToken()
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), actualColon, expectedColon)
 	assert.Equal(suite.T(), parser.index, 1)
 	parser.NextToken()
-	assert.Equal(suite.T(), parser.PeekToken(), expectedBytes)
+
+	actualBytes, err := parser.PeekToken()
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), actualBytes, expectedBytes)
 	assert.Equal(suite.T(), parser.index, 2)
 }
 
 func (suite *ParserTestSuite) TestParseByte() {
-	lexer := NewLexer("4:spam")
-	parser := newParser(lexer)
-	actual := parser.parseByte()
+	lexer := lexer.NewLexer("4:spam")
+	parser, err := newParser(lexer)
+	assert.NoError(suite.T(), err)
+
+	actual, err := parser.parseByte()
+	assert.NoError(suite.T(), err)
 	expected := ast.NewByteNode("spam")
 	assert.Equal(suite.T(), expected, actual)
 }
