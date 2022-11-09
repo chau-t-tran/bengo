@@ -105,6 +105,30 @@ func (suite *ParserTestSuite) TestBasicList() {
 	assert.Equal(suite.T(), expected, actual)
 }
 
+func (suite *ParserTestSuite) TestNestedList() {
+	lexer := lexer.NewLexer("lli32ei33eeli11e4:spamee")
+	parser, err := newParser(lexer)
+	assert.NoError(suite.T(), err)
+
+	expected := ast.NewListNode()
+	l1 := ast.NewListNode()
+	i1 := ast.NewIntNode("32")
+	i2 := ast.NewIntNode("33")
+	l1.Add(i1)
+	l1.Add(i2)
+	l2 := ast.NewListNode()
+	i3 := ast.NewIntNode("11")
+	b1 := ast.NewByteNode("spam")
+	l2.Add(i3)
+	l2.Add(b1)
+	expected.Add(l1)
+	expected.Add(l2)
+
+	actual, err := parser.parseList()
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), expected, actual)
+}
+
 func (suite *ParserTestSuite) TestParseUnknownByte() {
 	lexer := lexer.NewLexer("4:spam")
 	parser, err := newParser(lexer)
