@@ -2,6 +2,8 @@ package parser
 
 import (
 	"errors"
+	"fmt"
+	"strconv"
 
 	"github.com/chau-t-tran/bengo/ast"
 	"github.com/chau-t-tran/bengo/lexer"
@@ -90,4 +92,42 @@ func (p *parser) parseInt() (node *ast.IntNode, err error) {
 
 	node = ast.NewIntNode(integer.Literal)
 	return
+}
+
+func (p *parser) parseList() (node *ast.ListNode, err error) {
+	node = ast.NewListNode()
+
+	// Re: Add syntax errors - Expect "l" here
+	_, err = p.NextToken()
+
+	for p.next.Literal != "e" {
+		value, err := p.parseUnknown()
+		if err != nil {
+			return node, err
+		}
+		node.Add(value)
+	}
+
+	// Re: Add syntax errors - Expect "e" here
+	_, err = p.NextToken()
+	return
+}
+
+func (p *parser) parseUnknown() (node ast.BaseNodeInterface, err error) {
+	switch c := p.next.Literal; c {
+	case "i":
+		return p.parseInt()
+	case "e":
+		return node, errors.New(
+			fmt.Sprintf("End of value"),
+		)
+	default:
+		_, err := strconv.Atoi(c)
+		if err != nil {
+			return node, errors.New(
+				fmt.Sprintf("Unknown symbol %s", c),
+			)
+		}
+		return p.parseByte()
+	}
 }
