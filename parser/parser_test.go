@@ -74,6 +74,17 @@ func (suite *ParserTestSuite) TestParseByte() {
 	assert.Equal(suite.T(), expected, actual)
 }
 
+func (suite *ParserTestSuite) TestParseInteger() {
+	lexer := lexer.NewLexer("i123456e")
+	parser, err := newParser(lexer)
+	assert.NoError(suite.T(), err)
+
+	actual, err := parser.parseInt()
+	assert.NoError(suite.T(), err)
+	expected := ast.NewIntNode("123456")
+	assert.Equal(suite.T(), expected, actual)
+}
+
 func TestParserTestSuite(t *testing.T) {
 	suite.Run(t, new(ParserTestSuite))
 }
