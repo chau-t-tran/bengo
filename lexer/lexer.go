@@ -32,7 +32,8 @@ func NewLexer(input string) Lexer {
 
 func (l *Lexer) NextToken() (t token.Token, err error) {
 	if l.index >= len(l.chars) {
-		return t, errors.New("End of input")
+		t = token.NewToken(token.NULL, "")
+		return
 	}
 
 	c := l.chars[l.index]
