@@ -85,6 +85,48 @@ func (suite *ParserTestSuite) TestParseInteger() {
 	assert.Equal(suite.T(), expected, actual)
 }
 
+func (suite *ParserTestSuite) TestBasicList() {
+	lexer := lexer.NewLexer("li123e4:spam5:helloi23ee")
+	parser, err := newParser(lexer)
+	assert.NoError(suite.T(), err)
+
+	expected := ast.NewListNode()
+	i1 := ast.NewIntNode("123")
+	b1 := ast.NewByteNode("spam")
+	b2 := ast.NewByteNode("hello")
+	i2 := ast.NewIntNode("23")
+	expected.Add(i1)
+	expected.Add(b1)
+	expected.Add(b2)
+	expected.Add(i2)
+
+	actual, err := parser.parseList()
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), expected, actual)
+}
+
+func (suite *ParserTestSuite) TestParseUnknownByte() {
+	lexer := lexer.NewLexer("4:spam")
+	parser, err := newParser(lexer)
+	assert.NoError(suite.T(), err)
+
+	actual, err := parser.parseUnknown()
+	assert.NoError(suite.T(), err)
+	expected := ast.NewByteNode("spam")
+	assert.Equal(suite.T(), expected, actual)
+}
+
+func (suite *ParserTestSuite) TestParseUnknownInteger() {
+	lexer := lexer.NewLexer("i123456e")
+	parser, err := newParser(lexer)
+	assert.NoError(suite.T(), err)
+
+	actual, err := parser.parseUnknown()
+	assert.NoError(suite.T(), err)
+	expected := ast.NewIntNode("123456")
+	assert.Equal(suite.T(), expected, actual)
+}
+
 func TestParserTestSuite(t *testing.T) {
 	suite.Run(t, new(ParserTestSuite))
 }
