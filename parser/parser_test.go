@@ -25,17 +25,17 @@ func (suite *ParserTestSuite) TestNextToken() {
 
 	actualLength, err := parser.NextToken()
 	assert.NoError(suite.T(), err)
-	assert.Equal(suite.T(), actualLength, expectedLength)
+	assert.Equal(suite.T(), expectedLength, actualLength)
 	assert.Equal(suite.T(), parser.index, 1)
 
 	actualColon, err := parser.NextToken()
 	assert.NoError(suite.T(), err)
-	assert.Equal(suite.T(), actualColon, expectedColon)
+	assert.Equal(suite.T(), expectedColon, actualColon)
 	assert.Equal(suite.T(), parser.index, 2)
 
 	actualBytes, err := parser.NextToken()
 	assert.NoError(suite.T(), err)
-	assert.Equal(suite.T(), actualBytes, expectedBytes)
+	assert.Equal(suite.T(), expectedBytes, actualBytes)
 	assert.Equal(suite.T(), parser.index, 6)
 }
 
@@ -49,17 +49,17 @@ func (suite *ParserTestSuite) TestPeekToken() {
 	expectedBytes := token.NewToken(token.BYTE_LENGTH, "spam")
 
 	actualLength := parser.PeekToken()
-	assert.Equal(suite.T(), actualLength, expectedLength)
+	assert.Equal(suite.T(), expectedLength, actualLength)
 	assert.Equal(suite.T(), parser.index, 0)
 	parser.NextToken()
 
 	actualColon := parser.PeekToken()
-	assert.Equal(suite.T(), actualColon, expectedColon)
+	assert.Equal(suite.T(), expectedColon, actualColon)
 	assert.Equal(suite.T(), parser.index, 1)
 	parser.NextToken()
 
 	actualBytes := parser.PeekToken()
-	assert.Equal(suite.T(), actualBytes, expectedBytes)
+	assert.Equal(suite.T(), expectedBytes, actualBytes)
 	assert.Equal(suite.T(), parser.index, 2)
 }
 
