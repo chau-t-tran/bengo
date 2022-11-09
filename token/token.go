@@ -6,6 +6,7 @@ type Token struct {
 }
 
 const (
+	NULL         = -1
 	BYTE_LENGTH  = 0
 	BYTE_CONTENT = 1
 	INT_ENTRY    = 2
