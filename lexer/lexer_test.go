@@ -24,8 +24,10 @@ func assertLexerEquals(T *testing.T, expected []token.Token, lexer *Lexer) {
 		assert.NoError(T, err)
 	}
 	assert.Equal(T, expected, actual)
-	_, err := lexer.NextToken()
-	assert.Error(T, err)
+	terminationToken := token.NewToken(token.NULL, "")
+	lastToken, err := lexer.NextToken()
+	assert.NoError(T, err)
+	assert.Equal(T, terminationToken, lastToken)
 }
 
 func (suite *LexerTestSuite) TestConstructor() {
