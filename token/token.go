@@ -6,15 +6,15 @@ type Token struct {
 }
 
 const (
-	NULL         = -1
-	BYTE_LENGTH  = 0
-	BYTE_CONTENT = 1
-	INT_ENTRY    = 2
-	INT_VALUE    = 3
-	LIST_ENTRY   = 4
-	DICT_ENTRY   = 5
-	COLON        = 6
-	END          = 7
+	NULL int = iota
+	BYTE_LENGTH
+	BYTE_CONTENT
+	INT_ENTRY
+	INT_VALUE
+	LIST_ENTRY
+	DICT_ENTRY
+	COLON
+	END
 )
 
 func NewToken(tokenType int, tokenLiteral string) Token {
