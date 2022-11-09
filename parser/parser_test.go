@@ -21,7 +21,7 @@ func (suite *ParserTestSuite) TestNextToken() {
 
 	expectedLength := token.NewToken(token.BYTE_LENGTH, "4")
 	expectedColon := token.NewToken(token.COLON, ":")
-	expectedBytes := token.NewToken(token.BYTE_LENGTH, "spam")
+	expectedBytes := token.NewToken(token.BYTE_CONTENT, "spam")
 
 	actualLength, err := parser.NextToken()
 	assert.NoError(suite.T(), err)
@@ -46,7 +46,7 @@ func (suite *ParserTestSuite) TestPeekToken() {
 
 	expectedLength := token.NewToken(token.BYTE_LENGTH, "4")
 	expectedColon := token.NewToken(token.COLON, ":")
-	expectedBytes := token.NewToken(token.BYTE_LENGTH, "spam")
+	expectedBytes := token.NewToken(token.BYTE_CONTENT, "spam")
 
 	actualLength := parser.PeekToken()
 	assert.Equal(suite.T(), expectedLength, actualLength)
