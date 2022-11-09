@@ -69,3 +69,25 @@ func (p *parser) parseByte() (node *ast.ByteNode, err error) {
 	node = ast.NewByteNode(bytes.Literal)
 	return
 }
+
+func (p *parser) parseInt() (node *ast.IntNode, err error) {
+	// Re: Add syntax errors - Expect "i" here
+	_, err = p.NextToken()
+	if err != nil {
+		return node, err
+	}
+
+	integer, err := p.NextToken()
+	if err != nil {
+		return node, err
+	}
+
+	// Re: Add syntax errors - Expect "e" here
+	_, err = p.NextToken()
+	if err != nil {
+		return node, err
+	}
+
+	node = ast.NewIntNode(integer.Literal)
+	return
+}
