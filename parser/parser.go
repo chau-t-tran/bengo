@@ -117,6 +117,8 @@ func (p *parser) parseUnknown() (node ast.BaseNodeInterface, err error) {
 	switch c := p.next.Literal; c {
 	case "i":
 		return p.parseInt()
+	case "l":
+		return p.parseList()
 	case "e":
 		return node, errors.New(
 			fmt.Sprintf("End of value"),
