@@ -7,6 +7,7 @@ type Token struct {
 
 const (
 	NULL int = iota
+	TERMINATE
 	BYTE_LENGTH
 	BYTE_CONTENT
 	INT_ENTRY

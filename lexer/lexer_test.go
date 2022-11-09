@@ -24,7 +24,7 @@ func assertLexerEquals(T *testing.T, expected []token.Token, lexer *Lexer) {
 		assert.NoError(T, err)
 	}
 	assert.Equal(T, expected, actual)
-	terminationToken := token.NewToken(token.NULL, "")
+	terminationToken := token.NewToken(token.TERMINATE, "")
 	lastToken, err := lexer.NextToken()
 	assert.NoError(T, err)
 	assert.Equal(T, terminationToken, lastToken)

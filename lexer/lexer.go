@@ -32,7 +32,7 @@ func NewLexer(input string) Lexer {
 
 func (l *Lexer) NextToken() (t token.Token, err error) {
 	if l.index >= len(l.chars) {
-		t = token.NewToken(token.NULL, "")
+		t = token.NewToken(token.TERMINATE, "")
 		return
 	}
 
