@@ -113,6 +113,30 @@ func (p *parser) parseList() (node *ast.ListNode, err error) {
 	return
 }
 
+func (p *parser) parseDict() (node *ast.DictNode, err error) {
+	node = ast.NewDictNode()
+
+	// Re: Add syntax errors - Expect "d" here
+	_, err = p.NextToken()
+
+	for p.next.Literal != "e" {
+		key, err := p.parseByte()
+		if err != nil {
+			return node, err
+		}
+		value, err := p.parseUnknown()
+		if err != nil {
+			return node, err
+		}
+		node.Add(key, value)
+	}
+
+	// Re: Add syntax errors - Expect "e" here
+	_, err = p.NextToken()
+
+	return
+}
+
 func (p *parser) parseUnknown() (node ast.BaseNodeInterface, err error) {
 	switch c := p.next.Literal; c {
 	case "i":
