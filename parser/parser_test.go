@@ -129,6 +129,27 @@ func (suite *ParserTestSuite) TestNestedList() {
 	assert.Equal(suite.T(), expected, actual)
 }
 
+func (suite *ParserTestSuite) TestParseBasicDict() {
+	lexer := lexer.NewLexer("d4:val1i32e4:val24:spam6:value3i12ee")
+	parser, err := newParser(lexer)
+	assert.NoError(suite.T(), err)
+
+	expected := ast.NewDictNode()
+	k1 := ast.NewByteNode("val1")
+	i1 := ast.NewIntNode("32")
+	k2 := ast.NewByteNode("val2")
+	b1 := ast.NewByteNode("spam")
+	k3 := ast.NewByteNode("value3")
+	i2 := ast.NewIntNode("12")
+	expected.Add(k1, i1)
+	expected.Add(k2, b1)
+	expected.Add(k3, i2)
+
+	actual, err := parser.parseDict()
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), expected, actual)
+}
+
 func (suite *ParserTestSuite) TestParseUnknownByte() {
 	lexer := lexer.NewLexer("4:spam")
 	parser, err := newParser(lexer)
