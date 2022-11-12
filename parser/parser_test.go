@@ -150,6 +150,36 @@ func (suite *ParserTestSuite) TestParseBasicDict() {
 	assert.Equal(suite.T(), expected, actual)
 }
 
+func (suite *ParserTestSuite) TestParseComplexDict() {
+	lexer := lexer.NewLexer("d3:food4:spami32ee3:barli1ei2ei3eee")
+	parser, err := newParser(lexer)
+	assert.NoError(suite.T(), err)
+
+	expected := ast.NewDictNode()
+
+	k1 := ast.NewByteNode("foo")
+	v1 := ast.NewDictNode()
+	v1k1 := ast.NewByteNode("spam")
+	v1v1 := ast.NewIntNode("32")
+	v1.Add(v1k1, v1v1)
+
+	expected.Add(k1, v1)
+
+	k3 := ast.NewByteNode("bar")
+	v3 := ast.NewListNode()
+	i1 := ast.NewIntNode("1")
+	i2 := ast.NewIntNode("2")
+	i3 := ast.NewIntNode("3")
+	v3.Add(i1)
+	v3.Add(i2)
+	v3.Add(i3)
+	expected.Add(k3, v3)
+
+	actual, err := parser.parseDict()
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), expected, actual)
+}
+
 func (suite *ParserTestSuite) TestParseUnknownByte() {
 	lexer := lexer.NewLexer("4:spam")
 	parser, err := newParser(lexer)
