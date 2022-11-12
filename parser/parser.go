@@ -34,7 +34,7 @@ func newParser(lexer lexer.Lexer) (*parser, error) {
 	}, nil
 }
 
-func (p *parser) NextToken() (token.Token, error) {
+func (p *parser) nextToken() (token.Token, error) {
 	if p.current.Type == token.TERMINATE {
 		return p.current, errors.New("End of input")
 	}
@@ -46,24 +46,24 @@ func (p *parser) NextToken() (token.Token, error) {
 	return p.current, err
 }
 
-func (p *parser) PeekToken() token.Token {
+func (p *parser) peekToken() token.Token {
 	return p.next
 }
 
 func (p *parser) parseByte() (node *ast.ByteNode, err error) {
 	// Re: Add syntax errors - Expect colon here
-	_, err = p.NextToken()
+	_, err = p.nextToken()
 	if err != nil {
 		return node, err
 	}
 
 	// Re: Add syntax errors - Expect colon here
-	_, err = p.NextToken()
+	_, err = p.nextToken()
 	if err != nil {
 		return node, err
 	}
 
-	bytes, err := p.NextToken()
+	bytes, err := p.nextToken()
 	if err != nil {
 		return node, err
 	}
@@ -74,18 +74,18 @@ func (p *parser) parseByte() (node *ast.ByteNode, err error) {
 
 func (p *parser) parseInt() (node *ast.IntNode, err error) {
 	// Re: Add syntax errors - Expect "i" here
-	_, err = p.NextToken()
+	_, err = p.nextToken()
 	if err != nil {
 		return node, err
 	}
 
-	integer, err := p.NextToken()
+	integer, err := p.nextToken()
 	if err != nil {
 		return node, err
 	}
 
 	// Re: Add syntax errors - Expect "e" here
-	_, err = p.NextToken()
+	_, err = p.nextToken()
 	if err != nil {
 		return node, err
 	}
@@ -98,7 +98,7 @@ func (p *parser) parseList() (node *ast.ListNode, err error) {
 	node = ast.NewListNode()
 
 	// Re: Add syntax errors - Expect "l" here
-	_, err = p.NextToken()
+	_, err = p.nextToken()
 
 	for p.next.Literal != "e" {
 		value, err := p.parseUnknown()
@@ -109,7 +109,7 @@ func (p *parser) parseList() (node *ast.ListNode, err error) {
 	}
 
 	// Re: Add syntax errors - Expect "e" here
-	_, err = p.NextToken()
+	_, err = p.nextToken()
 	return
 }
 
@@ -117,7 +117,7 @@ func (p *parser) parseDict() (node *ast.DictNode, err error) {
 	node = ast.NewDictNode()
 
 	// Re: Add syntax errors - Expect "d" here
-	_, err = p.NextToken()
+	_, err = p.nextToken()
 
 	for p.next.Literal != "e" {
 		key, err := p.parseByte()
@@ -132,7 +132,7 @@ func (p *parser) parseDict() (node *ast.DictNode, err error) {
 	}
 
 	// Re: Add syntax errors - Expect "e" here
-	_, err = p.NextToken()
+	_, err = p.nextToken()
 
 	return
 }
