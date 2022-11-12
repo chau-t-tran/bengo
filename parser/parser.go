@@ -143,6 +143,8 @@ func (p *parser) parseUnknown() (node ast.BaseNodeInterface, err error) {
 		return p.parseInt()
 	case "l":
 		return p.parseList()
+	case "d":
+		return p.parseDict()
 	case "e":
 		return node, errors.New(
 			fmt.Sprintf("End of value"),
