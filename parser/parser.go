@@ -159,3 +159,18 @@ func (p *parser) parseUnknown() (node ast.BaseNodeInterface, err error) {
 		return p.parseByte()
 	}
 }
+
+func Parse(s string) (node ast.BaseNodeInterface, err error) {
+	lexer := lexer.NewLexer(s)
+	parser, err := newParser(lexer)
+	if err != nil {
+		return
+	}
+
+	node, err = parser.parseUnknown()
+	if err != nil {
+		return
+	}
+
+	return
+}

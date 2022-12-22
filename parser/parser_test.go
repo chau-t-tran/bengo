@@ -243,6 +243,24 @@ func (suite *ParserTestSuite) TestParseUnknownDict() {
 	assert.Equal(suite.T(), expected, actual)
 }
 
+func (suite *ParserTestSuite) TestParse() {
+	expected := ast.NewDictNode()
+	k1 := ast.NewByteNode("val1")
+	i1 := ast.NewIntNode("32")
+	k2 := ast.NewByteNode("val2")
+	b1 := ast.NewByteNode("spam")
+	k3 := ast.NewByteNode("value3")
+	i2 := ast.NewIntNode("12")
+	expected.Add(k1, i1)
+	expected.Add(k2, b1)
+	expected.Add(k3, i2)
+
+	actual, err := Parse("d4:val1i32e4:val24:spam6:value3i12ee")
+
+	assert.NoError(suite.T(), err)
+	assert.Equal(suite.T(), expected, actual)
+}
+
 func TestParserTestSuite(t *testing.T) {
 	suite.Run(t, new(ParserTestSuite))
 }
